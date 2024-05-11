@@ -6,6 +6,12 @@ centerWallThickness = 1;
 outerAxisDiam = 10;
 outerAxisRadius = 25;
 magnetDiameter = 3.2;
+magnetLength = 3.175;
+centerPlatformHeight = 2;
+shaftSide = 3;
+shaftHeight = 10;
+handleDiam = 40;
+handleHeight = 3;
 
 module base() {
     cylinder(discHeight, outerDiam/2, outerDiam/2);
@@ -23,7 +29,7 @@ module outerAxis() {
     }
 }
 
-module batteryCavity() {
+module magnetCavity() {
     for (i = [0:5]) {
         translate([0, 0, discHeight/2])
         rotate([-90, 0, i*60+30])
@@ -32,16 +38,40 @@ module batteryCavity() {
     }
 }
 
-module main() {
+module bottom() {
     difference() {
         base();
         centerAxis();
         outerAxis();
-        batteryCavity();
+        magnetCavity();
     }
 }
 
-main();
-//batteryCavity();
+module top() {
+    translate([0, 0, discHeight])
+    union() {
+        bottom();
+  
+        translate([0, 0, discHeight])
+        cylinder(centerPlatformHeight, centerAxisDiam/2+2*magnetLength*1.2, centerAxisDiam/2);
+        
+        translate([0, 0, discHeight+centerPlatformHeight+shaftSide/2])
+        cube([shaftSide, shaftSide, shaftHeight], true);
+    }
+}
+
+
+module handle() {
+    translate([0, 0, discHeight*2+centerPlatformHeight+shaftHeight/2])
+    difference() {
+        cylinder(handleHeight, handleDiam/2, handleDiam/2);
+        
+        
+    }
+}
+
+bottom();
+top();
+handle();
 
 echo(str("Magnet stack length: ", outerAxisRadius-outerAxisDiam/2-centerAxisDiam/2-centerWallThickness, " mm"));
